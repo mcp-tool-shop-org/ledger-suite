@@ -190,7 +190,9 @@ public class BundleVerifierTests : IDisposable
     public void Verify_NonExistentBundle_ReturnsInvalidInput()
     {
         var verifier = new BundleVerifier();
-        var result = verifier.Verify("/nonexistent/path/bundle.json");
+        // Use a path that doesn't exist on any platform
+        var nonexistentPath = Path.Combine(Path.GetTempPath(), "nonexistent_" + Guid.NewGuid().ToString("N"), "bundle.json");
+        var result = verifier.Verify(nonexistentPath);
 
         Assert.Equal(VerificationStatus.InvalidInput, result.Status);
         Assert.Contains("not found", result.Reason, StringComparison.OrdinalIgnoreCase);
