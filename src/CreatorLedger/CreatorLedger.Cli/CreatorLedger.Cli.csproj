@@ -10,6 +10,12 @@
 
     <!-- Not packable as NuGet (use 'dotnet publish' for distribution) -->
     <IsPackable>false</IsPackable>
+
+    <!-- Package metadata -->
+    <Description>CreatorLedger CLI - Standalone verifier for digital asset attestation proofs with Ed25519 signatures.</Description>
+    <Authors>mcp-tool-shop</Authors>
+    <Company>MCP Tool Shop</Company>
+    <Copyright>Copyright (c) 2025-2026 MCP Tool Shop</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

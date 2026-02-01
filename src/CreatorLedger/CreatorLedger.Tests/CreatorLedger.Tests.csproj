@@ -4,6 +4,10 @@
     <RootNamespace>CreatorLedger.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+
+    <!-- Package metadata -->
+    <Description>Unit and integration tests for CreatorLedger - cryptographic verification, attestation, and proof bundle tests.</Description>
+    <Authors>mcp-tool-shop</Authors>
   </PropertyGroup>
 
   <ItemGroup>

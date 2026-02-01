@@ -8,7 +8,10 @@
     <!-- NuGet package -->
     <IsPackable>true</IsPackable>
     <PackageId>ClaimLedger.Infrastructure</PackageId>
-    <Description>Infrastructure implementations for ClaimLedger.</Description>
+    <Description>Infrastructure implementations for ClaimLedger - SQLite persistence, schema migrations, and cryptographic verification.</Description>
+    <Authors>mcp-tool-shop</Authors>
+    <Company>MCP Tool Shop</Company>
+    <Copyright>Copyright (c) 2025-2026 MCP Tool Shop</Copyright>
     <PackageTags>claims;provenance;infrastructure</PackageTags>
   </PropertyGroup>
 
