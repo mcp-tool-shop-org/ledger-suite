@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
+  <a href="README.ja.md">日本語</a> | <a href="README.md">English</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
 </p>
 
 <p align="center">
@@ -12,17 +12,17 @@
   <a href="https://mcp-tool-shop-org.github.io/ledger-suite/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-Unified monorepo for cryptographic provenance ledgers.
+用于加密溯源账本的统一单仓库。
 
-## Projects
+## 项目
 
-| Project | Description | Tests |
-|---------|-------------|-------|
-| `src/ClaimLedger/` | Scientific claim provenance and verification | 371 |
-| `src/CreatorLedger/` | Creator attestation proofs | 219 |
-| `src/CreatorLedger/Shared.Crypto/` | Shared Ed25519 cryptography primitives | - |
+| 项目 | 描述 | 测试 |
+| --------- | ------------- | ------- |
+| `src/ClaimLedger/` | 科学主张的溯源和验证 | 371 |
+| `src/CreatorLedger/` | 创作者的证明 | 219 |
+| `src/CreatorLedger/Shared.Crypto/` | 共享的 Ed25519 加密原语 | - |
 
-## Quick Start
+## 快速开始
 
 ```bash
 # Clone
@@ -42,7 +42,7 @@ dotnet run --project src/ClaimLedger/ClaimLedger.Cli -- --help
 dotnet run --project src/CreatorLedger/CreatorLedger.Cli -- --help
 ```
 
-## Structure
+## 结构
 
 ```
 ledger-suite/
@@ -63,28 +63,28 @@ ledger-suite/
 │       └── Shared.Crypto/    # Shared crypto
 ```
 
-## ClaimLedger Features
+## ClaimLedger 的特性
 
-- **Claim assertion** with Ed25519 signatures
-- **Citations** linking claims with cryptographic proof
-- **Attestations** (peer review, reproduction, institutional approval)
-- **Revocations** with witness countersignatures
-- **RFC 3161 timestamps** for non-repudiation
-- **ClaimPacks** for distribution-ready bundles
-- **Local registry** for offline citation resolution
-- **Publish command** for one-click distribution
+- 使用 Ed25519 签名进行 **主张声明**
+- **引用**，将主张与加密证明相关联
+- **证明**（同行评审、复现、机构批准）
+- 使用见证方的共同签名进行 **撤销**
+- 使用 **RFC 3161 时间戳**，实现不可否认性
+- 使用 **ClaimPacks** 创建可分发的软件包
+- 使用 **本地注册表**，实现离线引用解析
+- 使用 **发布命令**，实现一键分发
 
-## CreatorLedger Features
+## CreatorLedger 的特性
 
-- **Creator attestation proofs** for digital assets
-- **Content hash verification**
-- **Multi-party attestation chains**
-- **Proof bundles** for portable verification
+- 用于数字资产的 **创作者证明**
+- **内容哈希验证**
+- **多方证明链**
+- **证明包**，用于便携式验证
 
-## License
+## 许可证
 
 MIT
 
 ---
 
-Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>
+由 <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a> 构建。

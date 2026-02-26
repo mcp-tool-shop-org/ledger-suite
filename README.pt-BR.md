@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
+  <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.md">English</a>
 </p>
 
 <p align="center">
@@ -12,17 +12,17 @@
   <a href="https://mcp-tool-shop-org.github.io/ledger-suite/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-Unified monorepo for cryptographic provenance ledgers.
+Repositório unificado para sistemas de registro de rastreabilidade criptográfica.
 
-## Projects
+## Projetos
 
-| Project | Description | Tests |
-|---------|-------------|-------|
-| `src/ClaimLedger/` | Scientific claim provenance and verification | 371 |
-| `src/CreatorLedger/` | Creator attestation proofs | 219 |
-| `src/CreatorLedger/Shared.Crypto/` | Shared Ed25519 cryptography primitives | - |
+| Projeto | Descrição | Testes |
+| --------- | ------------- | ------- |
+| `src/ClaimLedger/` | Rastreabilidade e verificação de alegações científicas. | 371 |
+| `src/CreatorLedger/` | Provas de autenticidade do criador. | 219 |
+| `src/CreatorLedger/Shared.Crypto/` | Funções criptográficas Ed25519 compartilhadas. | - |
 
-## Quick Start
+## Início rápido
 
 ```bash
 # Clone
@@ -42,7 +42,7 @@ dotnet run --project src/ClaimLedger/ClaimLedger.Cli -- --help
 dotnet run --project src/CreatorLedger/CreatorLedger.Cli -- --help
 ```
 
-## Structure
+## Estrutura
 
 ```
 ledger-suite/
@@ -63,28 +63,28 @@ ledger-suite/
 │       └── Shared.Crypto/    # Shared crypto
 ```
 
-## ClaimLedger Features
+## Características do ClaimLedger:
 
-- **Claim assertion** with Ed25519 signatures
-- **Citations** linking claims with cryptographic proof
-- **Attestations** (peer review, reproduction, institutional approval)
-- **Revocations** with witness countersignatures
-- **RFC 3161 timestamps** for non-repudiation
-- **ClaimPacks** for distribution-ready bundles
-- **Local registry** for offline citation resolution
-- **Publish command** for one-click distribution
+- **Afirmação de alegações** com assinaturas Ed25519.
+- **Citações** que vinculam as alegações a provas criptográficas.
+- **Atestados** (revisão por pares, reprodução, aprovação institucional).
+- **Revogações** com assinaturas de testemunhas.
+- **Carimbos de tempo RFC 3161** para não repúdio.
+- **ClaimPacks** para pacotes prontos para distribuição.
+- **Registro local** para resolução de citações offline.
+- **Comando de publicação** para distribuição com um clique.
 
-## CreatorLedger Features
+## Características do CreatorLedger:
 
-- **Creator attestation proofs** for digital assets
-- **Content hash verification**
-- **Multi-party attestation chains**
-- **Proof bundles** for portable verification
+- **Provas de autenticidade do criador** para ativos digitais.
+- **Verificação de hash de conteúdo**.
+- **Cadeias de atestados multipartes**.
+- **Pacotes de provas** para verificação portátil.
 
-## License
+## Licença
 
 MIT
 
 ---
 
-Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>
+Desenvolvido por <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>

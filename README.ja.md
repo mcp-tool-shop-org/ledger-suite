@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
+  <a href="README.md">English</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
 </p>
 
 <p align="center">
@@ -12,17 +12,17 @@
   <a href="https://mcp-tool-shop-org.github.io/ledger-suite/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-Unified monorepo for cryptographic provenance ledgers.
+暗号化されたトレーサビリティを管理するための統合型モノレポ。
 
-## Projects
+## プロジェクト
 
-| Project | Description | Tests |
-|---------|-------------|-------|
-| `src/ClaimLedger/` | Scientific claim provenance and verification | 371 |
-| `src/CreatorLedger/` | Creator attestation proofs | 219 |
-| `src/CreatorLedger/Shared.Crypto/` | Shared Ed25519 cryptography primitives | - |
+| プロジェクト | 説明 | テスト |
+| --------- | ------------- | ------- |
+| `src/ClaimLedger/` | 科学的データのトレーサビリティと検証 | 371 |
+| `src/CreatorLedger/` | 作成者の認証証明 | 219 |
+| `src/CreatorLedger/Shared.Crypto/` | 共有されるEd25519暗号化基盤 | - |
 
-## Quick Start
+## クイックスタート
 
 ```bash
 # Clone
@@ -42,7 +42,7 @@ dotnet run --project src/ClaimLedger/ClaimLedger.Cli -- --help
 dotnet run --project src/CreatorLedger/CreatorLedger.Cli -- --help
 ```
 
-## Structure
+## 構造
 
 ```
 ledger-suite/
@@ -63,28 +63,28 @@ ledger-suite/
 │       └── Shared.Crypto/    # Shared crypto
 ```
 
-## ClaimLedger Features
+## ClaimLedgerの機能
 
-- **Claim assertion** with Ed25519 signatures
-- **Citations** linking claims with cryptographic proof
-- **Attestations** (peer review, reproduction, institutional approval)
-- **Revocations** with witness countersignatures
-- **RFC 3161 timestamps** for non-repudiation
-- **ClaimPacks** for distribution-ready bundles
-- **Local registry** for offline citation resolution
-- **Publish command** for one-click distribution
+- Ed25519署名による**主張の表明**
+- 暗号化された証明と連携する**引用**
+- **認証**（ピアレビュー、再現、機関の承認）
+- 署名者の合意による**取り消し**
+- 不服申し立てを防ぐための**RFC 3161タイムスタンプ**
+- 配布可能な**ClaimPacks**
+- オフラインでの引用解決のための**ローカルレジストリ**
+- ワンクリックで配布できる**公開コマンド**
 
-## CreatorLedger Features
+## CreatorLedgerの機能
 
-- **Creator attestation proofs** for digital assets
-- **Content hash verification**
-- **Multi-party attestation chains**
-- **Proof bundles** for portable verification
+- デジタル資産の**作成者の認証証明**
+- **コンテンツハッシュの検証**
+- **複数当事者による認証チェーン**
+- 持ち運び可能な検証のための**証明バンドル**
 
-## License
+## ライセンス
 
 MIT
 
 ---
 
-Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>
+<a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>によって作成されました。
