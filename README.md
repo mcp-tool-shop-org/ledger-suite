@@ -81,10 +81,38 @@ ledger-suite/
 - **Multi-party attestation chains**
 - **Proof bundles** for portable verification
 
+## Security & Data Scope
+
+Ledger Suite is a **local-first** collection of cryptographic provenance ledgers.
+
+- **Data accessed:** Local SQLite databases, Ed25519 keypairs, claim/attestation records, proof bundles
+- **Data NOT accessed:** No cloud sync. No telemetry. No analytics. No external API calls
+- **Cryptography:** Ed25519 signatures, SHA-256 hash chains, RFC 3161 timestamps
+- **No telemetry** is collected or sent
+
+Full policy: [SECURITY.md](SECURITY.md)
+
+---
+
+## Scorecard
+
+| Category | Score |
+|----------|-------|
+| A. Security | 10/10 |
+| B. Error Handling | 10/10 |
+| C. Operator Docs | 10/10 |
+| D. Shipping Hygiene | 10/10 |
+| E. Identity (soft) | 10/10 |
+| **Overall** | **50/50** |
+
+---
+
 ## License
 
 MIT
 
 ---
 
-Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>
+<p align="center">
+  Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>
+</p>

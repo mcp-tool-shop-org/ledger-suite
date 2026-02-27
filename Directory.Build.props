@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <!-- Version injected by CI on tags; default for local builds -->
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
 
     <!-- Package metadata -->
     <Authors>mcp-tool-shop</Authors>
