@@ -14,7 +14,7 @@ export const config: SiteConfig = {
     headlineAccent: 'for claims and creators.',
     description: 'Ed25519 signatures, RFC 3161 timestamps, and attestation chains — packaged as two CLI-first .NET libraries with 590 tests.',
     primaryCta: { href: '#ledgers', label: 'See the ledgers' },
-    secondaryCta: { href: 'https://github.com/mcp-tool-shop-org/ledger-suite', label: 'GitHub' },
+    secondaryCta: { href: 'handbook/', label: 'Read the Handbook' },
     previews: [
       { label: 'Claim', code: 'dotnet run --project ClaimLedger.Cli -- assert claim.json' },
       { label: 'Attest', code: 'dotnet run --project CreatorLedger.Cli -- attest asset.png' },
