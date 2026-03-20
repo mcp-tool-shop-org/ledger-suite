@@ -30,75 +30,72 @@ public static partial class Program
     {
         var rootCommand = new RootCommand("ClaimLedger - Cryptographic provenance verification for scientific claims");
 
-        rootCommand.AddCommand(CreateVerifyCommand());
-        rootCommand.AddCommand(CreateInspectCommand());
-        rootCommand.AddCommand(CreateAttestCommand());
-        rootCommand.AddCommand(CreateAttestationsCommand());
-        rootCommand.AddCommand(CreateCiteCommand());
-        rootCommand.AddCommand(CreateCitationsCommand());
-        rootCommand.AddCommand(CreateRevokeKeyCommand());
-        rootCommand.AddCommand(CreateRevocationsCommand());
-        rootCommand.AddCommand(CreateWitnessCommand());
-        rootCommand.AddCommand(CreateTsaRequestCommand());
-        rootCommand.AddCommand(CreateTsaAttachCommand());
-        rootCommand.AddCommand(CreateTimestampsCommand());
-        rootCommand.AddCommand(CreatePackCommand());
-        rootCommand.AddCommand(CreateVerifyPackCommand());
-        rootCommand.AddCommand(CreatePackInspectCommand());
-        rootCommand.AddCommand(CreatePackSignCommand());
-        rootCommand.AddCommand(CreatePackDiffCommand());
-        rootCommand.AddCommand(CreatePackValidateUpdateCommand());
-        rootCommand.AddCommand(CreateRegistryCommand());
-        rootCommand.AddCommand(CreatePublishCommand());
+        rootCommand.Add(CreateVerifyCommand());
+        rootCommand.Add(CreateInspectCommand());
+        rootCommand.Add(CreateAttestCommand());
+        rootCommand.Add(CreateAttestationsCommand());
+        rootCommand.Add(CreateCiteCommand());
+        rootCommand.Add(CreateCitationsCommand());
+        rootCommand.Add(CreateRevokeKeyCommand());
+        rootCommand.Add(CreateRevocationsCommand());
+        rootCommand.Add(CreateWitnessCommand());
+        rootCommand.Add(CreateTsaRequestCommand());
+        rootCommand.Add(CreateTsaAttachCommand());
+        rootCommand.Add(CreateTimestampsCommand());
+        rootCommand.Add(CreatePackCommand());
+        rootCommand.Add(CreateVerifyPackCommand());
+        rootCommand.Add(CreatePackInspectCommand());
+        rootCommand.Add(CreatePackSignCommand());
+        rootCommand.Add(CreatePackDiffCommand());
+        rootCommand.Add(CreatePackValidateUpdateCommand());
+        rootCommand.Add(CreateRegistryCommand());
+        rootCommand.Add(CreatePublishCommand());
 
-        return await rootCommand.InvokeAsync(args);
+        return await rootCommand.Parse(args).InvokeAsync();
     }
 
     private static Command CreateVerifyCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
         var evidenceOption = new Option<DirectoryInfo?>(
-            "--evidence",
-            "Directory containing evidence files to verify against claimed hashes");
-        evidenceOption.AddAlias("-e");
+            "--evidence", "-e")
+        { Description = "Directory containing evidence files to verify against claimed hashes" };
 
         var attestationsOption = new Option<bool>(
-            "--attestations",
-            "Also verify all attestations in the bundle");
-        attestationsOption.AddAlias("-a");
+            "--attestations", "-a")
+        { Description = "Also verify all attestations in the bundle" };
 
         var citationsOption = new Option<bool>(
-            "--citations",
-            "Also verify all citations in the bundle");
-        citationsOption.AddAlias("-c");
+            "--citations", "-c")
+        { Description = "Also verify all citations in the bundle" };
 
         var strictCitationsOption = new Option<bool>(
-            "--strict-citations",
-            "Fail if any citation cannot be resolved to a known bundle");
+            "--strict-citations")
+        { Description = "Fail if any citation cannot be resolved to a known bundle" };
 
         var claimDirOption = new Option<DirectoryInfo?>(
-            "--claim-dir",
-            "Directory containing claim bundles for citation resolution");
+            "--claim-dir")
+        { Description = "Directory containing claim bundles for citation resolution" };
 
         var revocationsDirOption = new Option<DirectoryInfo?>(
-            "--revocations-dir",
-            "Directory containing revocation bundles to check against");
+            "--revocations-dir")
+        { Description = "Directory containing revocation bundles to check against" };
 
         var strictRevocationsOption = new Option<bool>(
-            "--strict-revocations",
-            "Fail if any signer key is revoked");
+            "--strict-revocations")
+        { Description = "Fail if any signer key is revoked" };
 
         var tsaOption = new Option<bool>(
-            "--tsa",
-            "Also verify RFC 3161 timestamp receipts");
+            "--tsa")
+        { Description = "Also verify RFC 3161 timestamp receipts" };
 
         var tsaTrustDirOption = new Option<DirectoryInfo?>(
-            "--tsa-trust-dir",
-            "Directory containing TSA trust anchors (certificates)");
+            "--tsa-trust-dir")
+        { Description = "Directory containing TSA trust anchors (certificates)" };
 
         var strictTsaOption = new Option<bool>(
-            "--strict-tsa",
-            "Fail if any TSA receipt is untrusted or invalid");
+            "--strict-tsa")
+        { Description = "Fail if any TSA receipt is untrusted or invalid" };
 
         var command = new Command("verify", "Verify a claim bundle's cryptographic validity")
         {
@@ -115,23 +112,22 @@ public static partial class Program
             strictTsaOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var bundle = context.ParseResult.GetValueForArgument(bundleArg);
-            var evidenceDir = context.ParseResult.GetValueForOption(evidenceOption);
-            var verifyAttestations = context.ParseResult.GetValueForOption(attestationsOption);
-            var verifyCitations = context.ParseResult.GetValueForOption(citationsOption);
-            var strictCitations = context.ParseResult.GetValueForOption(strictCitationsOption);
-            var claimDir = context.ParseResult.GetValueForOption(claimDirOption);
-            var revocationsDir = context.ParseResult.GetValueForOption(revocationsDirOption);
-            var strictRevocations = context.ParseResult.GetValueForOption(strictRevocationsOption);
-            var verifyTsa = context.ParseResult.GetValueForOption(tsaOption);
-            var tsaTrustDir = context.ParseResult.GetValueForOption(tsaTrustDirOption);
-            var strictTsa = context.ParseResult.GetValueForOption(strictTsaOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var evidenceDir = parseResult.GetValue(evidenceOption);
+            var verifyAttestations = parseResult.GetValue(attestationsOption);
+            var verifyCitations = parseResult.GetValue(citationsOption);
+            var strictCitations = parseResult.GetValue(strictCitationsOption);
+            var claimDir = parseResult.GetValue(claimDirOption);
+            var revocationsDir = parseResult.GetValue(revocationsDirOption);
+            var strictRevocations = parseResult.GetValue(strictRevocationsOption);
+            var verifyTsa = parseResult.GetValue(tsaOption);
+            var tsaTrustDir = parseResult.GetValue(tsaTrustDirOption);
+            var strictTsa = parseResult.GetValue(strictTsaOption);
 
-            var exitCode = await VerifyBundle(bundle, evidenceDir, verifyAttestations, verifyCitations,
+            return await VerifyBundle(bundle, evidenceDir, verifyAttestations, verifyCitations,
                 strictCitations, claimDir, revocationsDir, strictRevocations, verifyTsa, tsaTrustDir, strictTsa);
-            context.ExitCode = exitCode;
         });
 
         return command;
@@ -139,51 +135,44 @@ public static partial class Program
 
     private static Command CreateInspectCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var command = new Command("inspect", "Inspect a claim bundle without verification")
         {
             bundleArg
         };
 
-        command.SetHandler(async (FileInfo bundle) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await InspectBundle(bundle);
-            Environment.ExitCode = exitCode;
-        }, bundleArg);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            return await InspectBundle(bundle);
+        });
 
         return command;
     }
 
     private static Command CreateAttestCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
         var typeOption = new Option<string>(
-            "--type",
-            "Attestation type: REVIEWED, REPRODUCED, INSTITUTION_APPROVED, DATA_AVAILABILITY_CONFIRMED")
-        { IsRequired = true };
-        typeOption.AddAlias("-t");
+            "--type", "-t")
+        { Required = true, Description = "Attestation type: REVIEWED, REPRODUCED, INSTITUTION_APPROVED, DATA_AVAILABILITY_CONFIRMED" };
 
         var statementOption = new Option<string>(
-            "--statement",
-            "Attestation statement (what you are attesting)")
-        { IsRequired = true };
-        statementOption.AddAlias("-s");
+            "--statement", "-s")
+        { Required = true, Description = "Attestation statement (what you are attesting)" };
 
         var attestorKeyOption = new Option<FileInfo>(
-            "--attestor-key",
-            "Path to attestor private key JSON file")
-        { IsRequired = true };
-        attestorKeyOption.AddAlias("-k");
+            "--attestor-key", "-k")
+        { Required = true, Description = "Path to attestor private key JSON file" };
 
         var outputOption = new Option<FileInfo?>(
-            "--out",
-            "Output path for attested bundle (default: <input>.attested.json)");
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output path for attested bundle (default: <input>.attested.json)" };
 
         var expiresOption = new Option<string?>(
-            "--expires",
-            "Expiration date (ISO-8601 format, optional)");
+            "--expires")
+        { Description = "Expiration date (ISO-8601 format, optional)" };
 
         var command = new Command("attest", "Create an attestation for a claim bundle")
         {
@@ -195,29 +184,34 @@ public static partial class Program
             expiresOption
         };
 
-        command.SetHandler(async (FileInfo bundle, string type, string statement, FileInfo attestorKey, FileInfo? output, string? expires) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await CreateAttestation(bundle, type, statement, attestorKey, output, expires);
-            Environment.ExitCode = exitCode;
-        }, bundleArg, typeOption, statementOption, attestorKeyOption, outputOption, expiresOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var type = parseResult.GetValue(typeOption)!;
+            var statement = parseResult.GetValue(statementOption)!;
+            var attestorKey = parseResult.GetValue(attestorKeyOption)!;
+            var output = parseResult.GetValue(outputOption);
+            var expires = parseResult.GetValue(expiresOption);
+            return await CreateAttestation(bundle, type, statement, attestorKey, output, expires);
+        });
 
         return command;
     }
 
     private static Command CreateAttestationsCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var command = new Command("attestations", "List attestations in a claim bundle")
         {
             bundleArg
         };
 
-        command.SetHandler(async (FileInfo bundle) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await ListAttestations(bundle);
-            Environment.ExitCode = exitCode;
-        }, bundleArg);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            return await ListAttestations(bundle);
+        });
 
         return command;
     }
@@ -728,48 +722,39 @@ public static partial class Program
 
     private static Command CreateCiteCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var digestOption = new Option<string?>(
-            "--digest",
-            "Cited claim's claim_core_digest (hex SHA-256)");
-        digestOption.AddAlias("-d");
+            "--digest", "-d")
+        { Description = "Cited claim's claim_core_digest (hex SHA-256)" };
 
         var citedBundleOption = new Option<FileInfo?>(
-            "--bundle",
-            "Path to cited claim bundle (computes digest automatically)");
-        citedBundleOption.AddAlias("-b");
+            "--bundle", "-b")
+        { Description = "Path to cited claim bundle (computes digest automatically)" };
 
         var relationOption = new Option<string>(
-            "--relation",
-            "Citation relation: CITES, DEPENDS_ON, REPRODUCES, DISPUTES")
-        { IsRequired = true };
-        relationOption.AddAlias("-r");
+            "--relation", "-r")
+        { Required = true, Description = "Citation relation: CITES, DEPENDS_ON, REPRODUCES, DISPUTES" };
 
         var locatorOption = new Option<string?>(
-            "--locator",
-            "Optional locator (DOI, URL, filename)");
-        locatorOption.AddAlias("-l");
+            "--locator", "-l")
+        { Description = "Optional locator (DOI, URL, filename)" };
 
         var notesOption = new Option<string?>(
-            "--notes",
-            "Optional notes about this citation");
-        notesOption.AddAlias("-n");
+            "--notes", "-n")
+        { Description = "Optional notes about this citation" };
 
         var signerKeyOption = new Option<FileInfo>(
-            "--signer-key",
-            "Path to signer private key JSON file (claim author)")
-        { IsRequired = true };
-        signerKeyOption.AddAlias("-k");
+            "--signer-key", "-k")
+        { Required = true, Description = "Path to signer private key JSON file (claim author)" };
 
         var embedOption = new Option<bool>(
-            "--embed",
-            "Embed the cited bundle in the citation for offline verification");
+            "--embed")
+        { Description = "Embed the cited bundle in the citation for offline verification" };
 
         var outputOption = new Option<FileInfo?>(
-            "--out",
-            "Output path for cited bundle (default: <input>.cited.json)");
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output path for cited bundle (default: <input>.cited.json)" };
 
         var command = new Command("cite", "Add a citation to another claim")
         {
@@ -784,20 +769,19 @@ public static partial class Program
             outputOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var bundle = context.ParseResult.GetValueForArgument(bundleArg);
-            var digest = context.ParseResult.GetValueForOption(digestOption);
-            var citedBundle = context.ParseResult.GetValueForOption(citedBundleOption);
-            var relation = context.ParseResult.GetValueForOption(relationOption)!;
-            var locator = context.ParseResult.GetValueForOption(locatorOption);
-            var notes = context.ParseResult.GetValueForOption(notesOption);
-            var signerKey = context.ParseResult.GetValueForOption(signerKeyOption)!;
-            var embed = context.ParseResult.GetValueForOption(embedOption);
-            var output = context.ParseResult.GetValueForOption(outputOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var digest = parseResult.GetValue(digestOption);
+            var citedBundle = parseResult.GetValue(citedBundleOption);
+            var relation = parseResult.GetValue(relationOption)!;
+            var locator = parseResult.GetValue(locatorOption);
+            var notes = parseResult.GetValue(notesOption);
+            var signerKey = parseResult.GetValue(signerKeyOption)!;
+            var embed = parseResult.GetValue(embedOption);
+            var output = parseResult.GetValue(outputOption);
 
-            var exitCode = await CreateCitation(bundle, digest, citedBundle, relation, locator, notes, signerKey, embed, output);
-            context.ExitCode = exitCode;
+            return await CreateCitation(bundle, digest, citedBundle, relation, locator, notes, signerKey, embed, output);
         });
 
         return command;
@@ -805,18 +789,18 @@ public static partial class Program
 
     private static Command CreateCitationsCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var command = new Command("citations", "List citations in a claim bundle")
         {
             bundleArg
         };
 
-        command.SetHandler(async (FileInfo bundle) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await ListCitations(bundle);
-            Environment.ExitCode = exitCode;
-        }, bundleArg);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            return await ListCitations(bundle);
+        });
 
         return command;
     }
@@ -1122,36 +1106,31 @@ public static partial class Program
 
     private static Command CreateRevokeKeyCommand()
     {
-        var keyFileArg = new Argument<FileInfo>("key-file", "Path to key file to revoke");
+        var keyFileArg = new Argument<FileInfo>("key-file") { Description = "Path to key file to revoke" };
 
         var reasonOption = new Option<string>(
-            "--reason",
-            "Revocation reason: COMPROMISED, ROTATED, RETIRED, OTHER")
-        { IsRequired = true };
-        reasonOption.AddAlias("-r");
+            "--reason", "-r")
+        { Required = true, Description = "Revocation reason: COMPROMISED, ROTATED, RETIRED, OTHER" };
 
         var successorKeyOption = new Option<FileInfo?>(
-            "--successor-key",
-            "Path to successor key file (for rotation)");
-        successorKeyOption.AddAlias("-s");
+            "--successor-key", "-s")
+        { Description = "Path to successor key file (for rotation)" };
 
         var revokedAtOption = new Option<string?>(
-            "--revoked-at",
-            "Revocation time (ISO-8601, default: now)");
+            "--revoked-at")
+        { Description = "Revocation time (ISO-8601, default: now)" };
 
         var notesOption = new Option<string?>(
-            "--notes",
-            "Optional notes about this revocation");
-        notesOption.AddAlias("-n");
+            "--notes", "-n")
+        { Description = "Optional notes about this revocation" };
 
         var outputOption = new Option<FileInfo?>(
-            "--out",
-            "Output path for revocation bundle (default: <key-file>.revoked.json)");
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output path for revocation bundle (default: <key-file>.revoked.json)" };
 
         var successorSignedOption = new Option<bool>(
-            "--successor-signed",
-            "Sign with successor key instead of revoked key (requires --successor-key)");
+            "--successor-signed")
+        { Description = "Sign with successor key instead of revoked key (requires --successor-key)" };
 
         var command = new Command("revoke-key", "Create a key revocation")
         {
@@ -1164,18 +1143,17 @@ public static partial class Program
             successorSignedOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var keyFile = context.ParseResult.GetValueForArgument(keyFileArg);
-            var reason = context.ParseResult.GetValueForOption(reasonOption)!;
-            var successorKey = context.ParseResult.GetValueForOption(successorKeyOption);
-            var revokedAtStr = context.ParseResult.GetValueForOption(revokedAtOption);
-            var notes = context.ParseResult.GetValueForOption(notesOption);
-            var output = context.ParseResult.GetValueForOption(outputOption);
-            var successorSigned = context.ParseResult.GetValueForOption(successorSignedOption);
+            var keyFile = parseResult.GetValue(keyFileArg)!;
+            var reason = parseResult.GetValue(reasonOption)!;
+            var successorKey = parseResult.GetValue(successorKeyOption);
+            var revokedAtStr = parseResult.GetValue(revokedAtOption);
+            var notes = parseResult.GetValue(notesOption);
+            var output = parseResult.GetValue(outputOption);
+            var successorSigned = parseResult.GetValue(successorSignedOption);
 
-            var exitCode = await CreateRevocation(keyFile, reason, successorKey, revokedAtStr, notes, output, successorSigned);
-            context.ExitCode = exitCode;
+            return await CreateRevocation(keyFile, reason, successorKey, revokedAtStr, notes, output, successorSigned);
         });
 
         return command;
@@ -1183,18 +1161,18 @@ public static partial class Program
 
     private static Command CreateRevocationsCommand()
     {
-        var dirArg = new Argument<DirectoryInfo>("directory", "Directory containing revocation bundles");
+        var dirArg = new Argument<DirectoryInfo>("directory") { Description = "Directory containing revocation bundles" };
 
         var command = new Command("revocations", "List revocations in a directory")
         {
             dirArg
         };
 
-        command.SetHandler(async (DirectoryInfo dir) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await ListRevocations(dir);
-            Environment.ExitCode = exitCode;
-        }, dirArg);
+            var dir = parseResult.GetValue(dirArg)!;
+            return await ListRevocations(dir);
+        });
 
         return command;
     }
@@ -1388,28 +1366,23 @@ public static partial class Program
 
     private static Command CreateWitnessCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var witnessKeyOption = new Option<FileInfo>(
-            "--witness-key",
-            "Path to witness private key JSON file")
-        { IsRequired = true };
-        witnessKeyOption.AddAlias("-k");
+            "--witness-key", "-k")
+        { Required = true, Description = "Path to witness private key JSON file" };
 
         var issuedAtOption = new Option<string?>(
-            "--issued-at",
-            "Witness timestamp (ISO-8601 UTC, default: now)");
-        issuedAtOption.AddAlias("-t");
+            "--issued-at", "-t")
+        { Description = "Witness timestamp (ISO-8601 UTC, default: now)" };
 
         var statementOption = new Option<string?>(
-            "--statement",
-            "Optional statement (default: 'Witnessed claim existence')");
-        statementOption.AddAlias("-s");
+            "--statement", "-s")
+        { Description = "Optional statement (default: 'Witnessed claim existence')" };
 
         var outputOption = new Option<FileInfo?>(
-            "--out",
-            "Output path for witnessed bundle (default: <input>.witnessed.json)");
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output path for witnessed bundle (default: <input>.witnessed.json)" };
 
         var command = new Command("witness", "Create a witness timestamp attestation for a claim")
         {
@@ -1420,16 +1393,15 @@ public static partial class Program
             outputOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var bundle = context.ParseResult.GetValueForArgument(bundleArg);
-            var witnessKey = context.ParseResult.GetValueForOption(witnessKeyOption)!;
-            var issuedAtStr = context.ParseResult.GetValueForOption(issuedAtOption);
-            var statement = context.ParseResult.GetValueForOption(statementOption);
-            var output = context.ParseResult.GetValueForOption(outputOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var witnessKey = parseResult.GetValue(witnessKeyOption)!;
+            var issuedAtStr = parseResult.GetValue(issuedAtOption);
+            var statement = parseResult.GetValue(statementOption);
+            var output = parseResult.GetValue(outputOption);
 
-            var exitCode = await CreateWitnessAttestation(bundle, witnessKey, issuedAtStr, statement, output);
-            context.ExitCode = exitCode;
+            return await CreateWitnessAttestation(bundle, witnessKey, issuedAtStr, statement, output);
         });
 
         return command;
@@ -1601,20 +1573,19 @@ public static partial class Program
 
     private static Command CreateTsaRequestCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var outputOption = new Option<FileInfo?>(
-            "--out",
-            "Output path for timestamp request (.tsq file)");
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output path for timestamp request (.tsq file)" };
 
         var nonceOption = new Option<string?>(
-            "--nonce",
-            "Optional nonce (hex) for the request");
+            "--nonce")
+        { Description = "Optional nonce (hex) for the request" };
 
         var noCertReqOption = new Option<bool>(
-            "--no-cert-req",
-            "Don't request the TSA to include its certificate in the response");
+            "--no-cert-req")
+        { Description = "Don't request the TSA to include its certificate in the response" };
 
         var command = new Command("tsa-request", "Create an RFC 3161 timestamp request for a claim")
         {
@@ -1624,15 +1595,14 @@ public static partial class Program
             noCertReqOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var bundle = context.ParseResult.GetValueForArgument(bundleArg);
-            var output = context.ParseResult.GetValueForOption(outputOption);
-            var nonceHex = context.ParseResult.GetValueForOption(nonceOption);
-            var noCertReq = context.ParseResult.GetValueForOption(noCertReqOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var output = parseResult.GetValue(outputOption);
+            var nonceHex = parseResult.GetValue(nonceOption);
+            var noCertReq = parseResult.GetValue(noCertReqOption);
 
-            var exitCode = await CreateTsaRequest(bundle, output, nonceHex, noCertReq);
-            context.ExitCode = exitCode;
+            return await CreateTsaRequest(bundle, output, nonceHex, noCertReq);
         });
 
         return command;
@@ -1717,18 +1687,15 @@ public static partial class Program
 
     private static Command CreateTsaAttachCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var tokenOption = new Option<FileInfo>(
-            "--token",
-            "Path to TSA response token file (.tsr)")
-        { IsRequired = true };
-        tokenOption.AddAlias("-t");
+            "--token", "-t")
+        { Required = true, Description = "Path to TSA response token file (.tsr)" };
 
         var outputOption = new Option<FileInfo?>(
-            "--out",
-            "Output path for bundle with timestamp (default: <input>.tsa.json)");
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output path for bundle with timestamp (default: <input>.tsa.json)" };
 
         var command = new Command("tsa-attach", "Attach an RFC 3161 timestamp token to a claim")
         {
@@ -1737,14 +1704,13 @@ public static partial class Program
             outputOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var bundle = context.ParseResult.GetValueForArgument(bundleArg);
-            var token = context.ParseResult.GetValueForOption(tokenOption)!;
-            var output = context.ParseResult.GetValueForOption(outputOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var token = parseResult.GetValue(tokenOption)!;
+            var output = parseResult.GetValue(outputOption);
 
-            var exitCode = await AttachTsaToken(bundle, token, output);
-            context.ExitCode = exitCode;
+            return await AttachTsaToken(bundle, token, output);
         });
 
         return command;
@@ -1837,18 +1803,18 @@ public static partial class Program
 
     private static Command CreateTimestampsCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to claim bundle JSON file" };
 
         var command = new Command("timestamps", "List RFC 3161 timestamp receipts in a claim bundle")
         {
             bundleArg
         };
 
-        command.SetHandler(async (FileInfo bundle) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await ListTimestamps(bundle);
-            Environment.ExitCode = exitCode;
-        }, bundleArg);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            return await ListTimestamps(bundle);
+        });
 
         return command;
     }
@@ -1905,37 +1871,35 @@ public static partial class Program
 
     private static Command CreatePackCommand()
     {
-        var bundleArg = new Argument<FileInfo>("bundle", "Path to root claim bundle JSON file");
+        var bundleArg = new Argument<FileInfo>("bundle") { Description = "Path to root claim bundle JSON file" };
 
         var outputOption = new Option<DirectoryInfo>(
-            "--out",
-            "Output directory for the pack")
-        { IsRequired = true };
-        outputOption.AddAlias("-o");
+            "--out", "-o")
+        { Required = true, Description = "Output directory for the pack" };
 
         var includeCitationsOption = new Option<bool>(
-            "--include-citations",
-            "Include cited claim bundles in the pack");
+            "--include-citations")
+        { Description = "Include cited claim bundles in the pack" };
 
         var evidenceOption = new Option<DirectoryInfo?>(
-            "--include-evidence",
-            "Directory containing evidence files to include");
+            "--include-evidence")
+        { Description = "Directory containing evidence files to include" };
 
         var revocationsOption = new Option<DirectoryInfo?>(
-            "--include-revocations",
-            "Directory containing revocation bundles to include");
+            "--include-revocations")
+        { Description = "Directory containing revocation bundles to include" };
 
         var tsaTrustOption = new Option<DirectoryInfo?>(
-            "--include-tsa-trust",
-            "Directory containing TSA trust anchors to include");
+            "--include-tsa-trust")
+        { Description = "Directory containing TSA trust anchors to include" };
 
         var creatorLedgerOption = new Option<DirectoryInfo?>(
-            "--include-creatorledger",
-            "Directory containing CreatorLedger proof bundles to include");
+            "--include-creatorledger")
+        { Description = "Directory containing CreatorLedger proof bundles to include" };
 
         var strictCreatorLedgerOption = new Option<bool>(
-            "--strict-creatorledger",
-            "Fail if any CREATORLEDGER_BUNDLE evidence cannot be resolved");
+            "--strict-creatorledger")
+        { Description = "Fail if any CREATORLEDGER_BUNDLE evidence cannot be resolved" };
 
         var command = new Command("pack", "Create a portable ClaimPack from a claim bundle")
         {
@@ -1949,19 +1913,18 @@ public static partial class Program
             strictCreatorLedgerOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var bundle = context.ParseResult.GetValueForArgument(bundleArg);
-            var output = context.ParseResult.GetValueForOption(outputOption)!;
-            var includeCitations = context.ParseResult.GetValueForOption(includeCitationsOption);
-            var evidence = context.ParseResult.GetValueForOption(evidenceOption);
-            var revocations = context.ParseResult.GetValueForOption(revocationsOption);
-            var tsaTrust = context.ParseResult.GetValueForOption(tsaTrustOption);
-            var creatorLedger = context.ParseResult.GetValueForOption(creatorLedgerOption);
-            var strictCL = context.ParseResult.GetValueForOption(strictCreatorLedgerOption);
+            var bundle = parseResult.GetValue(bundleArg)!;
+            var output = parseResult.GetValue(outputOption)!;
+            var includeCitations = parseResult.GetValue(includeCitationsOption);
+            var evidence = parseResult.GetValue(evidenceOption);
+            var revocations = parseResult.GetValue(revocationsOption);
+            var tsaTrust = parseResult.GetValue(tsaTrustOption);
+            var creatorLedger = parseResult.GetValue(creatorLedgerOption);
+            var strictCL = parseResult.GetValue(strictCreatorLedgerOption);
 
-            var exitCode = await CreatePack(bundle, output, includeCitations, evidence, revocations, tsaTrust, creatorLedger, strictCL);
-            context.ExitCode = exitCode;
+            return await CreatePack(bundle, output, includeCitations, evidence, revocations, tsaTrust, creatorLedger, strictCL);
         });
 
         return command;
@@ -2029,63 +1992,63 @@ public static partial class Program
 
     private static Command CreateVerifyPackCommand()
     {
-        var packArg = new Argument<DirectoryInfo>("pack", "Path to ClaimPack directory");
+        var packArg = new Argument<DirectoryInfo>("pack") { Description = "Path to ClaimPack directory" };
 
         var strictOption = new Option<bool>(
-            "--strict",
-            "Enable all strict verification modes");
+            "--strict")
+        { Description = "Enable all strict verification modes" };
 
         var strictCitationsOption = new Option<bool>(
-            "--strict-citations",
-            "Fail if any citation cannot be resolved");
+            "--strict-citations")
+        { Description = "Fail if any citation cannot be resolved" };
 
         var strictRevocationsOption = new Option<bool>(
-            "--strict-revocations",
-            "Fail if any signer key is revoked");
+            "--strict-revocations")
+        { Description = "Fail if any signer key is revoked" };
 
         var strictTsaOption = new Option<bool>(
-            "--strict-tsa",
-            "Fail if any TSA receipt is untrusted");
+            "--strict-tsa")
+        { Description = "Fail if any TSA receipt is untrusted" };
 
         var verifyManifestSignaturesOption = new Option<bool>(
-            "--verify-manifest-signatures",
-            "Verify manifest signatures if present");
+            "--verify-manifest-signatures")
+        { Description = "Verify manifest signatures if present" };
 
         var strictManifestSignaturesOption = new Option<bool>(
-            "--strict-manifest-signatures",
-            "Require at least one valid manifest signature");
+            "--strict-manifest-signatures")
+        { Description = "Require at least one valid manifest signature" };
 
         var noCitationsOption = new Option<bool>(
-            "--no-citations",
-            "Skip citation verification");
+            "--no-citations")
+        { Description = "Skip citation verification" };
 
         var noAttestationsOption = new Option<bool>(
-            "--no-attestations",
-            "Skip attestation verification");
+            "--no-attestations")
+        { Description = "Skip attestation verification" };
 
         var noTsaOption = new Option<bool>(
-            "--no-tsa",
-            "Skip TSA timestamp verification");
+            "--no-tsa")
+        { Description = "Skip TSA timestamp verification" };
 
         var verifyCreatorLedgerOption = new Option<bool>(
-            "--verify-creatorledger",
-            "Verify CreatorLedger bundle evidence");
+            "--verify-creatorledger")
+        { Description = "Verify CreatorLedger bundle evidence" };
 
         var strictCreatorLedgerOption = new Option<bool>(
-            "--strict-creatorledger",
-            "Fail if any CreatorLedger bundle is missing or invalid");
+            "--strict-creatorledger")
+        { Description = "Fail if any CreatorLedger bundle is missing or invalid" };
 
         var creatorLedgerDirOption = new Option<DirectoryInfo?>(
-            "--creatorledger-dir",
-            "Override directory for resolving CreatorLedger bundles");
+            "--creatorledger-dir")
+        { Description = "Override directory for resolving CreatorLedger bundles" };
 
         var registryOption = new Option<DirectoryInfo?>(
-            "--registry",
-            "Registry for resolving citations and bundles");
+            "--registry")
+        { Description = "Registry for resolving citations and bundles" };
 
         var strictRegistryOption = new Option<bool>(
-            "--strict-registry",
-            "Fail if registry resolution fails");
+            "--strict-registry")
+        { Description = "Fail if registry resolution fails" };
 
         var command = new Command("verify-pack", "Verify a ClaimPack with one command")
         {
@@ -2106,29 +2069,28 @@ public static partial class Program
             strictRegistryOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var pack = context.ParseResult.GetValueForArgument(packArg);
-            var strict = context.ParseResult.GetValueForOption(strictOption);
-            var strictCitations = context.ParseResult.GetValueForOption(strictCitationsOption);
-            var strictRevocations = context.ParseResult.GetValueForOption(strictRevocationsOption);
-            var strictTsa = context.ParseResult.GetValueForOption(strictTsaOption);
-            var verifyManifestSigs = context.ParseResult.GetValueForOption(verifyManifestSignaturesOption);
-            var strictManifestSigs = context.ParseResult.GetValueForOption(strictManifestSignaturesOption);
-            var noCitations = context.ParseResult.GetValueForOption(noCitationsOption);
-            var noAttestations = context.ParseResult.GetValueForOption(noAttestationsOption);
-            var noTsa = context.ParseResult.GetValueForOption(noTsaOption);
-            var verifyCreatorLedger = context.ParseResult.GetValueForOption(verifyCreatorLedgerOption);
-            var strictCreatorLedger = context.ParseResult.GetValueForOption(strictCreatorLedgerOption);
-            var creatorLedgerDir = context.ParseResult.GetValueForOption(creatorLedgerDirOption);
-            var registry = context.ParseResult.GetValueForOption(registryOption);
-            var strictRegistry = context.ParseResult.GetValueForOption(strictRegistryOption);
+            var pack = parseResult.GetValue(packArg)!;
+            var strict = parseResult.GetValue(strictOption);
+            var strictCitations = parseResult.GetValue(strictCitationsOption);
+            var strictRevocations = parseResult.GetValue(strictRevocationsOption);
+            var strictTsa = parseResult.GetValue(strictTsaOption);
+            var verifyManifestSigs = parseResult.GetValue(verifyManifestSignaturesOption);
+            var strictManifestSigs = parseResult.GetValue(strictManifestSignaturesOption);
+            var noCitations = parseResult.GetValue(noCitationsOption);
+            var noAttestations = parseResult.GetValue(noAttestationsOption);
+            var noTsa = parseResult.GetValue(noTsaOption);
+            var verifyCreatorLedger = parseResult.GetValue(verifyCreatorLedgerOption);
+            var strictCreatorLedger = parseResult.GetValue(strictCreatorLedgerOption);
+            var creatorLedgerDir = parseResult.GetValue(creatorLedgerDirOption);
+            var registry = parseResult.GetValue(registryOption);
+            var strictRegistry = parseResult.GetValue(strictRegistryOption);
 
-            var exitCode = await VerifyPack(pack, strict, strictCitations, strictRevocations, strictTsa,
+            return await VerifyPack(pack, strict, strictCitations, strictRevocations, strictTsa,
                 strictManifestSigs, !noCitations, !noAttestations, !noTsa, verifyManifestSigs || strictManifestSigs,
                 verifyCreatorLedger || strictCreatorLedger, strictCreatorLedger, creatorLedgerDir,
                 registry, strictRegistry);
-            context.ExitCode = exitCode;
         });
 
         return command;
@@ -2245,18 +2207,18 @@ public static partial class Program
 
     private static Command CreatePackInspectCommand()
     {
-        var packArg = new Argument<DirectoryInfo>("pack", "Path to ClaimPack directory");
+        var packArg = new Argument<DirectoryInfo>("pack") { Description = "Path to ClaimPack directory" };
 
         var command = new Command("pack-inspect", "Inspect a ClaimPack without verification")
         {
             packArg
         };
 
-        command.SetHandler(async (DirectoryInfo pack) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var exitCode = await InspectPack(pack);
-            Environment.ExitCode = exitCode;
-        }, packArg);
+            var pack = parseResult.GetValue(packArg)!;
+            return await InspectPack(pack);
+        });
 
         return command;
     }
@@ -2361,24 +2323,19 @@ public static partial class Program
 
     private static Command CreatePackSignCommand()
     {
-        var packArg = new Argument<DirectoryInfo>("pack", "Path to ClaimPack directory");
+        var packArg = new Argument<DirectoryInfo>("pack") { Description = "Path to ClaimPack directory" };
 
         var keyOption = new Option<FileInfo>(
-            "--signer-key",
-            "Path to signer key file (JSON with ResearcherId, PublicKey, PrivateKey)");
-        keyOption.AddAlias("-k");
-        keyOption.IsRequired = true;
+            "--signer-key", "-k")
+        { Required = true, Description = "Path to signer key file (JSON with ResearcherId, PublicKey, PrivateKey)" };
 
         var kindOption = new Option<string>(
-            "--signer-kind",
-            () => ManifestSignerKind.ClaimAuthor,
-            $"Signer kind: {ManifestSignerKind.ClaimAuthor} or {ManifestSignerKind.Publisher}");
-        kindOption.AddAlias("--kind");
+            "--signer-kind", "--kind")
+        { DefaultValueFactory = _ => ManifestSignerKind.ClaimAuthor, Description = $"Signer kind: {ManifestSignerKind.ClaimAuthor} or {ManifestSignerKind.Publisher}" };
 
         var outOption = new Option<DirectoryInfo?>(
-            "--out",
-            "Output directory (default: update in place)");
-        outOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Output directory (default: update in place)" };
 
         var command = new Command("pack-sign", "Sign a ClaimPack manifest")
         {
@@ -2388,15 +2345,14 @@ public static partial class Program
             outOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var pack = context.ParseResult.GetValueForArgument(packArg);
-            var keyFile = context.ParseResult.GetValueForOption(keyOption)!;
-            var kind = context.ParseResult.GetValueForOption(kindOption)!;
-            var output = context.ParseResult.GetValueForOption(outOption);
+            var pack = parseResult.GetValue(packArg)!;
+            var keyFile = parseResult.GetValue(keyOption)!;
+            var kind = parseResult.GetValue(kindOption)!;
+            var output = parseResult.GetValue(outOption);
 
-            var exitCode = await SignPack(pack, keyFile, kind, output);
-            context.ExitCode = exitCode;
+            return await SignPack(pack, keyFile, kind, output);
         });
 
         return command;
@@ -2473,23 +2429,20 @@ public static partial class Program
 
     private static Command CreatePackDiffCommand()
     {
-        var packAArg = new Argument<DirectoryInfo>("pack-a", "Path to base pack (old version)");
-        var packBArg = new Argument<DirectoryInfo>("pack-b", "Path to updated pack (new version)");
+        var packAArg = new Argument<DirectoryInfo>("pack-a") { Description = "Path to base pack (old version)" };
+        var packBArg = new Argument<DirectoryInfo>("pack-b") { Description = "Path to updated pack (new version)" };
 
         var formatOption = new Option<string>(
-            "--format",
-            () => "text",
-            "Output format: text or json");
-        formatOption.AddAlias("-f");
+            "--format", "-f")
+        { DefaultValueFactory = _ => "text", Description = "Output format: text or json" };
 
         var outOption = new Option<FileInfo?>(
-            "--out",
-            "Write diff report to file");
-        outOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Write diff report to file" };
 
         var failOnOption = new Option<string?>(
-            "--fail-on",
-            "Exit with code 2 if update class is at least this level: MODIFIED, BREAKING");
+            "--fail-on")
+        { Description = "Exit with code 2 if update class is at least this level: MODIFIED, BREAKING" };
 
         var command = new Command("pack-diff", "Compare two ClaimPacks and show differences")
         {
@@ -2500,16 +2453,15 @@ public static partial class Program
             failOnOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var packA = context.ParseResult.GetValueForArgument(packAArg);
-            var packB = context.ParseResult.GetValueForArgument(packBArg);
-            var format = context.ParseResult.GetValueForOption(formatOption)!;
-            var output = context.ParseResult.GetValueForOption(outOption);
-            var failOn = context.ParseResult.GetValueForOption(failOnOption);
+            var packA = parseResult.GetValue(packAArg)!;
+            var packB = parseResult.GetValue(packBArg)!;
+            var format = parseResult.GetValue(formatOption)!;
+            var output = parseResult.GetValue(outOption);
+            var failOn = parseResult.GetValue(failOnOption);
 
-            var exitCode = await DiffPacks(packA, packB, format, output, failOn);
-            context.ExitCode = exitCode;
+            return await DiffPacks(packA, packB, format, output, failOn);
         });
 
         return command;
@@ -2666,19 +2618,16 @@ public static partial class Program
 
     private static Command CreatePackValidateUpdateCommand()
     {
-        var packAArg = new Argument<DirectoryInfo>("pack-a", "Path to base pack (old version)");
-        var packBArg = new Argument<DirectoryInfo>("pack-b", "Path to updated pack (new version)");
+        var packAArg = new Argument<DirectoryInfo>("pack-a") { Description = "Path to base pack (old version)" };
+        var packBArg = new Argument<DirectoryInfo>("pack-b") { Description = "Path to updated pack (new version)" };
 
         var policyOption = new Option<string>(
-            "--policy",
-            () => PackUpdatePolicy.AppendOnly,
-            $"Update policy: {PackUpdatePolicy.AppendOnly} or {PackUpdatePolicy.AllowModified}");
-        policyOption.AddAlias("-p");
+            "--policy", "-p")
+        { DefaultValueFactory = _ => PackUpdatePolicy.AppendOnly, Description = $"Update policy: {PackUpdatePolicy.AppendOnly} or {PackUpdatePolicy.AllowModified}" };
 
         var outOption = new Option<FileInfo?>(
-            "--out",
-            "Write validation report to file");
-        outOption.AddAlias("-o");
+            "--out", "-o")
+        { Description = "Write validation report to file" };
 
         var command = new Command("pack-validate-update", "Validate a pack update against a policy")
         {
@@ -2688,15 +2637,14 @@ public static partial class Program
             outOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var packA = context.ParseResult.GetValueForArgument(packAArg);
-            var packB = context.ParseResult.GetValueForArgument(packBArg);
-            var policy = context.ParseResult.GetValueForOption(policyOption)!;
-            var output = context.ParseResult.GetValueForOption(outOption);
+            var packA = parseResult.GetValue(packAArg)!;
+            var packB = parseResult.GetValue(packBArg)!;
+            var policy = parseResult.GetValue(policyOption)!;
+            var output = parseResult.GetValue(outOption);
 
-            var exitCode = await ValidatePackUpdate(packA, packB, policy, output);
-            context.ExitCode = exitCode;
+            return await ValidatePackUpdate(packA, packB, policy, output);
         });
 
         return command;
@@ -2768,25 +2716,26 @@ public static partial class Program
     {
         var registryCommand = new Command("registry", "Manage local claim registries for offline resolution");
 
-        registryCommand.AddCommand(CreateRegistryInitCommand());
-        registryCommand.AddCommand(CreateRegistryAddCommand());
-        registryCommand.AddCommand(CreateRegistryBuildCommand());
-        registryCommand.AddCommand(CreateRegistryQueryCommand());
+        registryCommand.Add(CreateRegistryInitCommand());
+        registryCommand.Add(CreateRegistryAddCommand());
+        registryCommand.Add(CreateRegistryBuildCommand());
+        registryCommand.Add(CreateRegistryQueryCommand());
 
         return registryCommand;
     }
 
     private static Command CreateRegistryInitCommand()
     {
-        var pathArg = new Argument<DirectoryInfo>("path", "Path to create registry at");
+        var pathArg = new Argument<DirectoryInfo>("path") { Description = "Path to create registry at" };
 
         var command = new Command("init", "Initialize a new registry")
         {
             pathArg
         };
 
-        command.SetHandler(async (DirectoryInfo path) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
+            var path = parseResult.GetValue(pathArg)!;
             var result = await InitRegistryHandler.HandleAsync(new InitRegistryCommand(path.FullName));
 
             if (result.Success)
@@ -2794,26 +2743,27 @@ public static partial class Program
                 Console.WriteLine($"\u2714 Registry initialized");
                 Console.WriteLine($"  Registry ID: {result.RegistryId}");
                 Console.WriteLine($"  Index:       {result.IndexPath}");
+                return 0;
             }
             else
             {
                 Console.WriteLine($"\u2718 Failed to initialize registry");
                 Console.WriteLine($"  {result.Error}");
-                Environment.ExitCode = 5;
+                return 5;
             }
-        }, pathArg);
+        });
 
         return command;
     }
 
     private static Command CreateRegistryAddCommand()
     {
-        var registryArg = new Argument<DirectoryInfo>("registry", "Path to registry");
-        var packArg = new Argument<string>("pack", "Path to pack (directory or .zip)");
+        var registryArg = new Argument<DirectoryInfo>("registry") { Description = "Path to registry" };
+        var packArg = new Argument<string>("pack") { Description = "Path to pack (directory or .zip)" };
 
         var copyOption = new Option<bool>(
-            "--copy",
-            "Copy pack into registry instead of referencing by path");
+            "--copy")
+        { Description = "Copy pack into registry instead of referencing by path" };
 
         var command = new Command("add", "Add a pack to the registry")
         {
@@ -2822,8 +2772,12 @@ public static partial class Program
             copyOption
         };
 
-        command.SetHandler(async (DirectoryInfo registry, string pack, bool copy) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
+            var registry = parseResult.GetValue(registryArg)!;
+            var pack = parseResult.GetValue(packArg)!;
+            var copy = parseResult.GetValue(copyOption);
+
             var result = await AddPackToRegistryHandler.HandleAsync(
                 new AddPackToRegistryCommand(registry.FullName, pack, copy));
 
@@ -2834,29 +2788,30 @@ public static partial class Program
                 Console.WriteLine($"  Digest:    {Truncate(result.RootDigest ?? "", 16)}...");
                 Console.WriteLine($"  Claims:    {result.ClaimsIndexed}");
                 Console.WriteLine($"  Bundles:   {result.CreatorLedgerBundlesIndexed}");
+                return 0;
             }
             else
             {
                 Console.WriteLine($"\u2718 Failed to add pack");
                 Console.WriteLine($"  {result.Error}");
-                Environment.ExitCode = 5;
+                return 5;
             }
-        }, registryArg, packArg, copyOption);
+        });
 
         return command;
     }
 
     private static Command CreateRegistryBuildCommand()
     {
-        var registryArg = new Argument<DirectoryInfo>("registry", "Path to registry");
+        var registryArg = new Argument<DirectoryInfo>("registry") { Description = "Path to registry" };
 
         var scanOption = new Option<DirectoryInfo?>(
-            "--scan",
-            "Directory to scan for new packs");
+            "--scan")
+        { Description = "Directory to scan for new packs" };
 
         var forceOption = new Option<bool>(
-            "--force",
-            "Force full rebuild of index");
+            "--force")
+        { Description = "Force full rebuild of index" };
 
         var command = new Command("build", "Rebuild or refresh registry index")
         {
@@ -2865,8 +2820,12 @@ public static partial class Program
             forceOption
         };
 
-        command.SetHandler(async (DirectoryInfo registry, DirectoryInfo? scan, bool force) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
+            var registry = parseResult.GetValue(registryArg)!;
+            var scan = parseResult.GetValue(scanOption);
+            var force = parseResult.GetValue(forceOption);
+
             var result = await BuildRegistryHandler.HandleAsync(
                 new BuildRegistryCommand(registry.FullName, scan?.FullName, force));
 
@@ -2886,33 +2845,34 @@ public static partial class Program
                 {
                     Console.WriteLine($"  \u26A0 {warning}");
                 }
+                return 0;
             }
             else
             {
                 Console.WriteLine($"\u2718 Failed to build registry");
                 Console.WriteLine($"  {result.Error}");
-                Environment.ExitCode = 5;
+                return 5;
             }
-        }, registryArg, scanOption, forceOption);
+        });
 
         return command;
     }
 
     private static Command CreateRegistryQueryCommand()
     {
-        var registryArg = new Argument<DirectoryInfo>("registry", "Path to registry");
+        var registryArg = new Argument<DirectoryInfo>("registry") { Description = "Path to registry" };
 
         var claimDigestOption = new Option<string?>(
-            "--claim-digest",
-            "Query for claim by digest (or prefix)");
+            "--claim-digest")
+        { Description = "Query for claim by digest (or prefix)" };
 
         var bundleDigestOption = new Option<string?>(
-            "--creatorledger-digest",
-            "Query for CreatorLedger bundle by digest (or prefix)");
+            "--creatorledger-digest")
+        { Description = "Query for CreatorLedger bundle by digest (or prefix)" };
 
         var pickFirstOption = new Option<bool>(
-            "--pick-first",
-            "If prefix is ambiguous, return first match");
+            "--pick-first")
+        { Description = "If prefix is ambiguous, return first match" };
 
         var command = new Command("query", "Query registry for claims or bundles")
         {
@@ -2922,13 +2882,17 @@ public static partial class Program
             pickFirstOption
         };
 
-        command.SetHandler(async (DirectoryInfo registry, string? claimDigest, string? bundleDigest, bool pickFirst) =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
+            var registry = parseResult.GetValue(registryArg)!;
+            var claimDigest = parseResult.GetValue(claimDigestOption);
+            var bundleDigest = parseResult.GetValue(bundleDigestOption);
+            var pickFirst = parseResult.GetValue(pickFirstOption);
+
             if (string.IsNullOrEmpty(claimDigest) && string.IsNullOrEmpty(bundleDigest))
             {
                 Console.WriteLine("Error: Specify --claim-digest or --creatorledger-digest");
-                Environment.ExitCode = 4;
-                return;
+                return 4;
             }
 
             var result = await QueryRegistryHandler.HandleAsync(
@@ -2954,14 +2918,13 @@ public static partial class Program
                     Console.WriteLine($"\u2718 Query failed");
                     Console.WriteLine($"  {result.Error}");
                 }
-                Environment.ExitCode = result.ExitCode;
-                return;
+                return result.ExitCode;
             }
 
             if (result.Matches.Count == 0)
             {
                 Console.WriteLine("No matches found");
-                return;
+                return 0;
             }
 
             Console.WriteLine($"\u2714 Found {result.Matches.Count} match(es):");
@@ -2974,7 +2937,8 @@ public static partial class Program
                 Console.WriteLine($"  Path:   {match.RelativePath}");
                 Console.WriteLine($"  Full:   {match.FullPath}");
             }
-        }, registryArg, claimDigestOption, bundleDigestOption, pickFirstOption);
+            return 0;
+        });
 
         return command;
     }

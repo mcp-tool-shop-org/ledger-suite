@@ -13,25 +13,18 @@ public static class Program
     {
         var rootCommand = new RootCommand("CreatorLedger - Cryptographic provenance verification");
 
-        // verify command
-        var verifyCommand = CreateVerifyCommand();
-        rootCommand.AddCommand(verifyCommand);
+        rootCommand.Add(CreateVerifyCommand());
+        rootCommand.Add(CreateInspectCommand());
 
-        // inspect command
-        var inspectCommand = CreateInspectCommand();
-        rootCommand.AddCommand(inspectCommand);
-
-        return await rootCommand.InvokeAsync(args);
+        return await rootCommand.Parse(args).InvokeAsync();
     }
 
     private static Command CreateVerifyCommand()
     {
-        var bundleArg = new Argument<FileInfo>("proof", "Path to the proof bundle JSON file");
-        var assetOption = new Option<FileInfo?>("--asset", "Path to the asset file to verify hash");
-        assetOption.AddAlias("-a");
-        var verboseOption = new Option<bool>("--verbose", "Show detailed verification steps");
-        verboseOption.AddAlias("-v");
-        var jsonOption = new Option<bool>("--json", "Output result as JSON");
+        var bundleArg = new Argument<FileInfo>("proof") { Description = "Path to the proof bundle JSON file" };
+        var assetOption = new Option<FileInfo?>("--asset", "-a") { Description = "Path to the asset file to verify hash" };
+        var verboseOption = new Option<bool>("--verbose", "-v") { Description = "Show detailed verification steps" };
+        var jsonOption = new Option<bool>("--json") { Description = "Output result as JSON" };
 
         var command = new Command("verify", "Verify a proof bundle")
         {
@@ -41,14 +34,23 @@ public static class Program
             jsonOption
         };
 
-        command.SetHandler(HandleVerify, bundleArg, assetOption, verboseOption, jsonOption);
+        command.SetAction((ParseResult parseResult) =>
+        {
+            var bundleFile = parseResult.GetValue(bundleArg)!;
+            var assetFile = parseResult.GetValue(assetOption);
+            var verbose = parseResult.GetValue(verboseOption);
+            var json = parseResult.GetValue(jsonOption);
+
+            return HandleVerify(bundleFile, assetFile, verbose, json);
+        });
+
         return command;
     }
 
     private static Command CreateInspectCommand()
     {
-        var bundleArg = new Argument<FileInfo>("proof", "Path to the proof bundle JSON file");
-        var jsonOption = new Option<bool>("--json", "Output result as JSON");
+        var bundleArg = new Argument<FileInfo>("proof") { Description = "Path to the proof bundle JSON file" };
+        var jsonOption = new Option<bool>("--json") { Description = "Output result as JSON" };
 
         var command = new Command("inspect", "Inspect a proof bundle structure")
         {
@@ -56,11 +58,18 @@ public static class Program
             jsonOption
         };
 
-        command.SetHandler(HandleInspect, bundleArg, jsonOption);
+        command.SetAction((ParseResult parseResult) =>
+        {
+            var bundleFile = parseResult.GetValue(bundleArg)!;
+            var json = parseResult.GetValue(jsonOption);
+
+            return HandleInspect(bundleFile, json);
+        });
+
         return command;
     }
 
-    private static Task<int> HandleVerify(FileInfo bundleFile, FileInfo? assetFile, bool verbose, bool json)
+    private static int HandleVerify(FileInfo bundleFile, FileInfo? assetFile, bool verbose, bool json)
     {
         var verifier = new BundleVerifier();
         var result = verifier.Verify(bundleFile.FullName, assetFile?.FullName);
@@ -74,10 +83,10 @@ public static class Program
             OutputHuman(result, verbose);
         }
 
-        return Task.FromResult((int)result.Status);
+        return (int)result.Status;
     }
 
-    private static Task<int> HandleInspect(FileInfo bundleFile, bool json)
+    private static int HandleInspect(FileInfo bundleFile, bool json)
     {
         var inspector = new BundleInspector();
         var result = inspector.Inspect(bundleFile.FullName, out var error);
@@ -92,7 +101,7 @@ public static class Program
             {
                 Console.Error.WriteLine($"Error: {error}");
             }
-            return Task.FromResult((int)VerificationStatus.InvalidInput);
+            return (int)VerificationStatus.InvalidInput;
         }
 
         if (json)
@@ -104,7 +113,7 @@ public static class Program
             OutputInspection(result);
         }
 
-        return Task.FromResult(0);
+        return 0;
     }
 
     private static readonly JsonSerializerOptions JsonOutputOptions = new()

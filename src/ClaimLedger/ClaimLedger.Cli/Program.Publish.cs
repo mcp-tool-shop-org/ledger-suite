@@ -9,83 +9,76 @@ public static partial class Program
     private static Command CreatePublishCommand()
     {
         // Required arguments
-        var claimArg = new Argument<FileInfo>("claim", "Path to claim bundle JSON file");
+        var claimArg = new Argument<FileInfo>("claim") { Description = "Path to claim bundle JSON file" };
 
         // Output options
         var outOption = new Option<string>(
-            "--out",
-            "Output path (directory or .zip file)")
-        { IsRequired = true };
-        outOption.AddAlias("-o");
+            "--out", "-o")
+        { Required = true, Description = "Output path (directory or .zip file)" };
 
         var zipOption = new Option<bool>(
-            "--zip",
-            "Output as ZIP archive (auto-detected if --out ends with .zip)");
+            "--zip")
+        { Description = "Output as ZIP archive (auto-detected if --out ends with .zip)" };
 
         // Include options
         var evidenceOption = new Option<DirectoryInfo?>(
-            "--evidence",
-            "Directory containing evidence files to include");
-        evidenceOption.AddAlias("-e");
+            "--evidence", "-e")
+        { Description = "Directory containing evidence files to include" };
 
         var creatorLedgerOption = new Option<DirectoryInfo?>(
-            "--creatorledger",
-            "Directory containing CreatorLedger proof bundles to include");
+            "--creatorledger")
+        { Description = "Directory containing CreatorLedger proof bundles to include" };
 
         var revocationsOption = new Option<DirectoryInfo?>(
-            "--revocations",
-            "Directory containing revocation files to include");
+            "--revocations")
+        { Description = "Directory containing revocation files to include" };
 
         var tsaTrustOption = new Option<DirectoryInfo?>(
-            "--tsa-trust",
-            "Directory containing TSA trust anchor certificates");
+            "--tsa-trust")
+        { Description = "Directory containing TSA trust anchor certificates" };
 
         var includeCitationsOption = new Option<bool>(
-            "--include-citations",
-            () => true,
-            "Include embedded citations in the pack");
+            "--include-citations")
+        { DefaultValueFactory = _ => true, Description = "Include embedded citations in the pack" };
 
         var includeAttestationsOption = new Option<bool>(
-            "--include-attestations",
-            () => true,
-            "Include attestations in verification");
+            "--include-attestations")
+        { DefaultValueFactory = _ => true, Description = "Include attestations in verification" };
 
         var includeTimestampsOption = new Option<bool>(
-            "--include-timestamps",
-            () => true,
-            "Include timestamp receipts in verification");
+            "--include-timestamps")
+        { DefaultValueFactory = _ => true, Description = "Include timestamp receipts in verification" };
 
         // Signing options
         var signPackOption = new Option<bool>(
-            "--sign-pack",
-            "Sign the pack manifest");
+            "--sign-pack")
+        { Description = "Sign the pack manifest" };
 
         var publisherKeyOption = new Option<FileInfo?>(
-            "--publisher-key",
-            "Path to publisher private key JSON file");
+            "--publisher-key")
+        { Description = "Path to publisher private key JSON file" };
 
         var publisherIdentityOption = new Option<FileInfo?>(
-            "--publisher-identity",
-            "Path to publisher identity JSON file");
+            "--publisher-identity")
+        { Description = "Path to publisher identity JSON file" };
 
         var authorKeyOption = new Option<FileInfo?>(
-            "--author-key",
-            "Path to author private key JSON file");
+            "--author-key")
+        { Description = "Path to author private key JSON file" };
 
         var authorIdentityOption = new Option<FileInfo?>(
-            "--author-identity",
-            "Path to author identity JSON file");
+            "--author-identity")
+        { Description = "Path to author identity JSON file" };
 
         // Verification options
         var strictOption = new Option<bool>(
-            "--strict",
-            () => true,
-            "Run strict verification gate (default: true for publishing)");
+            "--strict")
+        { DefaultValueFactory = _ => true, Description = "Run strict verification gate (default: true for publishing)" };
 
         // Report option
         var reportOption = new Option<FileInfo?>(
-            "--report",
-            "Path to write publish report JSON");
+            "--report")
+        { Description = "Path to write publish report JSON" };
 
         var command = new Command("publish", "Publish a claim bundle as a ready-to-share ClaimPack")
         {
@@ -108,27 +101,27 @@ public static partial class Program
             reportOption
         };
 
-        command.SetHandler(async context =>
+        command.SetAction(async (ParseResult parseResult) =>
         {
-            var claim = context.ParseResult.GetValueForArgument(claimArg);
-            var outPath = context.ParseResult.GetValueForOption(outOption)!;
-            var zip = context.ParseResult.GetValueForOption(zipOption);
-            var evidence = context.ParseResult.GetValueForOption(evidenceOption);
-            var creatorLedger = context.ParseResult.GetValueForOption(creatorLedgerOption);
-            var revocations = context.ParseResult.GetValueForOption(revocationsOption);
-            var tsaTrust = context.ParseResult.GetValueForOption(tsaTrustOption);
-            var includeCitations = context.ParseResult.GetValueForOption(includeCitationsOption);
-            var includeAttestations = context.ParseResult.GetValueForOption(includeAttestationsOption);
-            var includeTimestamps = context.ParseResult.GetValueForOption(includeTimestampsOption);
-            var signPack = context.ParseResult.GetValueForOption(signPackOption);
-            var publisherKey = context.ParseResult.GetValueForOption(publisherKeyOption);
-            var publisherIdentity = context.ParseResult.GetValueForOption(publisherIdentityOption);
-            var authorKey = context.ParseResult.GetValueForOption(authorKeyOption);
-            var authorIdentity = context.ParseResult.GetValueForOption(authorIdentityOption);
-            var strict = context.ParseResult.GetValueForOption(strictOption);
-            var report = context.ParseResult.GetValueForOption(reportOption);
+            var claim = parseResult.GetValue(claimArg)!;
+            var outPath = parseResult.GetValue(outOption)!;
+            var zip = parseResult.GetValue(zipOption);
+            var evidence = parseResult.GetValue(evidenceOption);
+            var creatorLedger = parseResult.GetValue(creatorLedgerOption);
+            var revocations = parseResult.GetValue(revocationsOption);
+            var tsaTrust = parseResult.GetValue(tsaTrustOption);
+            var includeCitations = parseResult.GetValue(includeCitationsOption);
+            var includeAttestations = parseResult.GetValue(includeAttestationsOption);
+            var includeTimestamps = parseResult.GetValue(includeTimestampsOption);
+            var signPack = parseResult.GetValue(signPackOption);
+            var publisherKey = parseResult.GetValue(publisherKeyOption);
+            var publisherIdentity = parseResult.GetValue(publisherIdentityOption);
+            var authorKey = parseResult.GetValue(authorKeyOption);
+            var authorIdentity = parseResult.GetValue(authorIdentityOption);
+            var strict = parseResult.GetValue(strictOption);
+            var report = parseResult.GetValue(reportOption);
 
-            var exitCode = await Publish(
+            return await Publish(
                 claim, outPath, zip,
                 evidence, creatorLedger, revocations, tsaTrust,
                 includeCitations, includeAttestations, includeTimestamps,
@@ -136,8 +129,6 @@ public static partial class Program
                 publisherKey, publisherIdentity,
                 authorKey, authorIdentity,
                 strict, report);
-
-            context.ExitCode = exitCode;
         });
 
         return command;
